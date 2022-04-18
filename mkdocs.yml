@@ -1,5 +1,5 @@
 site_name: prefect-cubejs
-repo_url: https://github.com/alelollo/prefect-cubejs
+repo_url: https://github.com/AlessandroLollo/prefect-cubejs
 theme:
   name: material
   palette:

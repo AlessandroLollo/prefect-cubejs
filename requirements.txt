@@ -1,1 +1,2 @@
+PyJWT>=2.3.0
 prefect>=2.0a13
