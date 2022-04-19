@@ -27,15 +27,13 @@ pip install prefect-cubejs
 ```python
 from prefect import flow
 from prefect_cubejs.tasks import (
-    goodbye_prefect_cubejs,
-    hello_prefect_cubejs,
+    run_query
 )
 
 
 @flow
 def example_flow():
-    hello_prefect_cubejs
-    goodbye_prefect_cubejs
+    run_query()
 
 example_flow()
 ```
