@@ -138,7 +138,7 @@ def test_run_with_max_wait_time_raises():
             max_wait_time=3,
         )
 
-    msg_match = "Cube.js load API took longer than 3 seconds to provide a response."
+    msg_match = "Cube.js API took longer than 3 seconds to provide a response."
 
     with pytest.raises(CubeJSAPIFailureException, match=msg_match):
         test_flow().result().result()
