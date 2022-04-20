@@ -2,7 +2,7 @@
 
 ## Welcome!
 
-Prefect collection of tasks to interact with Cube.js
+Prefect collection of tasks to interact with <a href="https://cube.dev/" target="_blank">Cube.js</a>
 
 ## Getting Started
 
@@ -33,7 +33,11 @@ from prefect_cubejs.tasks import (
 
 @flow
 def example_flow():
-    run_query()
+    run_query(
+        subdomain="<your Cube Cloud subdomain>",
+        api_secret="<your Cube.js API secret>",
+        query="<a Cube.js JSON formatted query>"
+    )
 
 example_flow()
 ```
