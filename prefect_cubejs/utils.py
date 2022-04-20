@@ -124,8 +124,8 @@ class CubeJSClient:
             - params (dict): Parameters to be passed to the API call.
 
         Raises:
-            - `prefect.engine.signals.FAIL` if the response has `status_code != 200`.
-            - `prefect.engine.signals.FAIL` if the REST APIs takes too long to respond,
+            - `CubeJSAPIFailureException` if the response has `status_code != 200`.
+            - `CubeJSAPIFailureException` if the REST APIs takes too long to respond,
                 with regards to `max_wait_time`.
 
         Returns:
