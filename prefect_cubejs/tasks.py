@@ -68,8 +68,8 @@ def run_query(
         - `CubeJSConfigurationException` if `api_token` is missing
             and `api_token_env_var` cannot be found.
         - `CubeJSConfigurationException` if `query` is missing.
-        - `prefect.engine.signals.FAIL` if the Cube.js load API fails.
-        - `prefect.engine.signals.FAIL` if the Cube.js load API takes more than
+        - `CubeJSAPIFailureException` if the Cube.js load API fails.
+        - `CubeJSAPIFailureException` if the Cube.js load API takes more than
             `max_wait_time` seconds to respond.
 
     Returns:
