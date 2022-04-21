@@ -30,38 +30,36 @@ def run_query(
     https://cube.dev/docs/rest-api#api-reference-v-1-load.
 
     Args:
-        - subdomain (str, optional): The subdomain to use to get the data.
+        - subdomain: The subdomain to use to get the data.
             If provided, `subdomain` takes precedence over `url`.
             This is likely to be useful to Cube Cloud users.
-        - url (str, optional): The URL to use to get the data.
+        - url: The URL to use to get the data.
             This is likely to be useful to users of self-hosted Cube.js.
-        - api_secret (str, optional): The API secret used to generate an
+        - api_secret: The API secret used to generate an
             API token for authentication.
             If provided, it takes precedence over `api_secret_env_var`.
-        - api_secret_env_var (str, optional): The name of the env var that contains
+        - api_secret_env_var: The name of the env var that contains
             the API secret to use to generate an API token for authentication.
             Defaults to `CUBEJS_API_SECRET`.
-        - query (dict, list, optional): `dict` or `list` representing
+        - query: `dict` or `list` representing
             valid Cube.js queries.
             If you pass multiple queries, then be aware of Cube.js Data Blending.
             More info at https://cube.dev/docs/rest-api#api-reference-v-1-load
             and at https://cube.dev/docs/schema/advanced/data-blending.
             Query format can be found at: https://cube.dev/docs/query-format.
-        - include_generated_sql: (bool, optional): Whether the return object should
+        - include_generated_sql: Whether the return object should
             include SQL info or not.
             Default to `False`.
-        - security_context (str, dict, optional): The security context to use
+        - security_context: The security context to use
             during authentication.
             If the security context does not contain an expiration period,
             then a 7-day expiration period is added automatically.
             More info at: https://cube.dev/docs/security/context.
-        - wait_time_between_api_calls (int, optional): The number of seconds to
+        - wait_time_between_api_calls: The number of seconds to
             wait between API calls.
             Default to 10.
-        - max_wait_time (int, optional): The number of seconds to wait for the
+        - max_wait_time: The number of seconds to wait for the
             Cube.js load API to return a response.
-        - **kwargs (optional): Additional keyword arguments to pass to the
-            standard Task initalization.
 
     Raises:
         - `CubeJSConfigurationException` if both `subdomain` and `url` are missing.
