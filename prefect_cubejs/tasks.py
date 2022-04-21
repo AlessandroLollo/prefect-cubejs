@@ -3,7 +3,7 @@ Collection of tasks to interact with Cube.js
 """
 import json
 import os
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from prefect import task
 
@@ -13,16 +13,16 @@ from prefect_cubejs.utils import CubeJSClient
 
 @task
 def run_query(
-    subdomain: str = None,
-    url: str = None,
-    api_secret: str = None,
-    api_secret_env_var: str = "CUBEJS_API_SECRET",
-    query: Union[Dict, List[Dict]] = None,
-    include_generated_sql: bool = False,
-    security_context: Union[str, Dict] = None,
-    wait_time_between_api_calls: int = 10,
-    max_wait_time: int = None,
-):
+    subdomain: Optional[str] = None,
+    url: Optional[str] = None,
+    api_secret: Optional[str] = None,
+    api_secret_env_var: Optional[str] = "CUBEJS_API_SECRET",
+    query: Optional[Union[Dict, List[Dict]]] = None,
+    include_generated_sql: Optional[bool] = False,
+    security_context: Optional[Union[str, Dict]] = None,
+    wait_time_between_api_calls: Optional[int] = 10,
+    max_wait_time: Optional[int] = None,
+) -> Dict:
     """
     This task calls Cueb.js load API and returns the result
     as a JSON object.
@@ -30,35 +30,35 @@ def run_query(
     https://cube.dev/docs/rest-api#api-reference-v-1-load.
 
     Args:
-        - subdomain: The subdomain to use to get the data.
+        subdomain: The subdomain to use to get the data.
             If provided, `subdomain` takes precedence over `url`.
             This is likely to be useful to Cube Cloud users.
-        - url: The URL to use to get the data.
+        url: The URL to use to get the data.
             This is likely to be useful to users of self-hosted Cube.js.
-        - api_secret: The API secret used to generate an
+        api_secret: The API secret used to generate an
             API token for authentication.
             If provided, it takes precedence over `api_secret_env_var`.
-        - api_secret_env_var: The name of the env var that contains
+        api_secret_env_var: The name of the env var that contains
             the API secret to use to generate an API token for authentication.
             Defaults to `CUBEJS_API_SECRET`.
-        - query: `dict` or `list` representing
+        query: `dict` or `list` representing
             valid Cube.js queries.
             If you pass multiple queries, then be aware of Cube.js Data Blending.
             More info at https://cube.dev/docs/rest-api#api-reference-v-1-load
             and at https://cube.dev/docs/schema/advanced/data-blending.
             Query format can be found at: https://cube.dev/docs/query-format.
-        - include_generated_sql: Whether the return object should
+        include_generated_sql: Whether the return object should
             include SQL info or not.
             Default to `False`.
-        - security_context: The security context to use
+        security_context: The security context to use
             during authentication.
             If the security context does not contain an expiration period,
             then a 7-day expiration period is added automatically.
             More info at: https://cube.dev/docs/security/context.
-        - wait_time_between_api_calls: The number of seconds to
+        wait_time_between_api_calls: The number of seconds to
             wait between API calls.
             Default to 10.
-        - max_wait_time: The number of seconds to wait for the
+        max_wait_time: The number of seconds to wait for the
             Cube.js load API to return a response.
 
     Raises:
@@ -71,7 +71,7 @@ def run_query(
             `max_wait_time` seconds to respond.
 
     Returns:
-        - The Cube.js JSON response, augmented with SQL
+        The Cube.js JSON response, augmented with SQL
             information if `include_generated_sql` is `True`.
     """
 
