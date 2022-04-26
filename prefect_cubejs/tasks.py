@@ -13,11 +13,11 @@ from prefect_cubejs.utils import CubeJSClient
 
 @task
 def run_query(
+    query: Union[Dict, List[Dict]],
     subdomain: Optional[str] = None,
     url: Optional[str] = None,
     api_secret: Optional[str] = None,
     api_secret_env_var: Optional[str] = "CUBEJS_API_SECRET",
-    query: Optional[Union[Dict, List[Dict]]] = None,
     include_generated_sql: Optional[bool] = False,
     security_context: Optional[Union[str, Dict]] = None,
     wait_time_between_api_calls: Optional[int] = 10,

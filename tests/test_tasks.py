@@ -15,7 +15,7 @@ from prefect_cubejs.tasks import run_query
 def test_run_with_no_values_raises():
     @flow
     def test_flow():
-        return run_query()
+        return run_query(query={"measure": "count"})
 
     msg_match = "Missing both `subdomain` and `url`."
     with pytest.raises(CubeJSConfigurationException, match=msg_match):
@@ -25,7 +25,7 @@ def test_run_with_no_values_raises():
 def test_run_without_api_secret_api_secret_env_var():
     @flow
     def test_flow():
-        return run_query(subdomain="xyz")
+        return run_query(subdomain="xyz", query={"measure": "count"})
 
     msg_match = "Missing `api_secret` and `api_secret_env_var` not found."
     with pytest.raises(CubeJSConfigurationException, match=msg_match):
@@ -35,7 +35,7 @@ def test_run_without_api_secret_api_secret_env_var():
 def test_run_without_query_raises():
     @flow
     def test_flow():
-        return run_query(subdomain="xyz", api_secret="secret")
+        return run_query(subdomain="xyz", api_secret="secret", query=None)
 
     msg_match = "Missing `query`."
     with pytest.raises(CubeJSConfigurationException, match=msg_match):
