@@ -24,7 +24,7 @@ def run_query(
     max_wait_time: Optional[int] = None,
 ) -> Dict:
     """
-    This task calls Cueb.js load API and returns the result
+    This task calls Cube.js load API and returns the result
     as a JSON object.
     More info about Cube.js load API at
     https://cube.dev/docs/rest-api#api-reference-v-1-load.
