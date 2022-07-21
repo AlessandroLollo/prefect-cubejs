@@ -13,17 +13,17 @@ from prefect_cubejs.tasks import run_query
 
 
 def test_run_with_no_values_raises():
-    @flow
+    @flow(name="test_flow_1")
     def test_flow():
         return run_query(query={"measure": "count"})
 
     msg_match = "Missing both `subdomain` and `url`."
     with pytest.raises(CubeJSConfigurationException, match=msg_match):
-        test_flow().result().result()
+        test_flow()
 
 
 def test_run_without_api_secret_api_secret_env_var():
-    @flow
+    @flow(name="test_flow_2")
     def test_flow():
         return run_query(subdomain="xyz", query={"measure": "count"})
 
@@ -33,18 +33,18 @@ def test_run_without_api_secret_api_secret_env_var():
 
 
 def test_run_without_query_raises():
-    @flow
+    @flow(name="test_flow_3")
     def test_flow():
         return run_query(subdomain="xyz", api_secret="secret", query=None)
 
     msg_match = "Missing `query`."
     with pytest.raises(CubeJSConfigurationException, match=msg_match):
-        test_flow().result().result()
+        test_flow()
 
 
 @responses.activate
 def test_run_with_failing_api_raises():
-    @flow
+    @flow(name="test_flow_4")
     def test_flow():
         return run_query(
             subdomain="test", api_secret="foo", query={"measures": "count"}
@@ -56,7 +56,7 @@ def test_run_with_failing_api_raises():
 
     msg_match = "Cube.js load API failed!"
     with pytest.raises(CubeJSAPIFailureException, match=msg_match):
-        test_flow().result().result()
+        test_flow()
 
 
 @responses.activate
@@ -77,7 +77,7 @@ def test_run_with_continue_waiting():
         json={"data": "result"},
     )
 
-    @flow
+    @flow(name="test_flow_5")
     def test_flow():
         return run_query(
             subdomain="test", api_secret="foo", query={"measures": "count"}
@@ -85,7 +85,7 @@ def test_run_with_continue_waiting():
 
     expected_url = api_url + "?query=" + quote_plus('{"measures": "count"}')
 
-    data = test_flow().result().result()
+    data = test_flow()
 
     assert responses.assert_call_count(expected_url, 2) is True
     assert isinstance(data, dict)
@@ -100,7 +100,7 @@ def test_run_with_security_context():
         json={"data": "result"},
     )
 
-    @flow
+    @flow(name="test_flow_6")
     def test_flow():
         return run_query(
             subdomain="test",
@@ -113,7 +113,7 @@ def test_run_with_security_context():
         payload={"foo": "bar", "expiresIn": "7d"}, key="foo", algorithm="HS256"
     )
 
-    test_flow().result().result()
+    test_flow()
 
     assert responses.calls[0].request.headers["Authorization"] == expected_jwt
 
@@ -127,7 +127,7 @@ def test_run_with_max_wait_time_raises():
         json={"error": "Continue wait"},
     )
 
-    @flow
+    @flow(name="test_flow_7")
     def test_flow():
         return run_query(
             subdomain="test",
@@ -141,7 +141,7 @@ def test_run_with_max_wait_time_raises():
     msg_match = "Cube.js API took longer than 3 seconds to provide a response."
 
     with pytest.raises(CubeJSAPIFailureException, match=msg_match):
-        test_flow().result().result()
+        test_flow()
 
 
 @responses.activate
@@ -160,7 +160,7 @@ def test_run_with_include_generated_sql():
         json={"sql": "sql"},
     )
 
-    @flow
+    @flow(name="test_flow_8")
     def test_flow():
         return run_query(
             subdomain="test",
@@ -169,7 +169,7 @@ def test_run_with_include_generated_sql():
             include_generated_sql=True,
         )
 
-    data = test_flow().result().result()
+    data = test_flow()
 
     assert isinstance(data, dict)
     assert "data" in data.keys()
