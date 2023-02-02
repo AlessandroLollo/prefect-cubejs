@@ -245,7 +245,7 @@ def build_pre_aggregations(
                 in_process.append(token)
 
         if missing_only:
-            msg = f"""
+            msg = """
             Cube pre-aggregations build failed: missing partitions.
             """
             raise CubeJSAPIFailureException(msg)
