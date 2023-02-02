@@ -136,3 +136,7 @@ dmypy.json
 
 # Jupyter notebook
 *.ipynb
+
+# Local E2E test scripts
+tests/e2e_no_wait_flow.py
+tests/e2e_wait_flow.py
