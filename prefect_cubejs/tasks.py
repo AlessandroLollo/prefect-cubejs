@@ -6,8 +6,12 @@ import os
 import time
 from typing import Dict, List, Optional, Union
 
-from prefect import task, get_run_logger
-from prefect_cubejs.exceptions import CubeJSConfigurationException, CubeJSAPIFailureException
+from prefect import get_run_logger, task
+
+from prefect_cubejs.exceptions import (
+    CubeJSAPIFailureException,
+    CubeJSConfigurationException,
+)
 from prefect_cubejs.utils import CubeJSClient
 
 
@@ -157,14 +161,17 @@ def build_pre_aggregations(
 
     Raises:
         - `CubeJSConfigurationException` if both `subdomain` and `url` are missing.
-        - `CubeJSConfigurationException` if `api_token` is missing and `api_token_env_var` cannot be found.
+        - `CubeJSConfigurationException` if `api_token` is missing and
+            `api_token_env_var` cannot be found.
         - `CubeJSConfigurationException` if `selector` is missing.
         - `CubeJSAPIFailureException` if the Cube `pre-aggregations/jobs` API fails.
         - `CubeJSAPIFailureException` if any pre-aggregations were not built.
 
     Returns:
-        - If `wait_for_job_run_completion = False`, then returns the Cube `pre-aggregations/jobs` API trigger run result.
-        - If `wait_for_job_run_completion = True`, then returns `True` if pre-aggregations were successfully built. Raise otherwise.
+        - If `wait_for_job_run_completion = False`, then returns the Cube
+            `pre-aggregations/jobs` API trigger run result.
+        - If `wait_for_job_run_completion = True`, then returns `True` if
+            pre-aggregations were successfully built. Raise otherwise.
     """
 
     logger = get_run_logger()
@@ -172,9 +179,11 @@ def build_pre_aggregations(
     # assert
     if not subdomain and not url:
         raise CubeJSConfigurationException("Missing both `subdomain` and `url`.")
-    
+
     if not api_secret and api_secret_env_var not in os.environ:
-        raise CubeJSConfigurationException("Missing `api_secret` and `api_secret_env_var` not found.")
+        raise CubeJSConfigurationException(
+            "Missing `api_secret` and `api_secret_env_var` not found."
+        )
 
     if not selector:
         raise CubeJSConfigurationException("Missing `selector`.")
@@ -182,12 +191,12 @@ def build_pre_aggregations(
     # client
     secret = api_secret if api_secret else os.environ[api_secret_env_var]
     cubejs_client = CubeJSClient(
-        subdomain = subdomain,
-        url = url,
-        security_context = security_context,
-        secret = secret,
-        wait_api_call_secs = None,
-        max_wait_time = None,
+        subdomain=subdomain,
+        url=url,
+        security_context=security_context,
+        secret=secret,
+        wait_api_call_secs=None,
+        max_wait_time=None,
     )
 
     # post
@@ -197,7 +206,7 @@ def build_pre_aggregations(
             "selector": selector,
         }
     )
-    tokens = cubejs_client.pre_aggregations_jobs(query = query)
+    tokens = cubejs_client.pre_aggregations_jobs(query=query)
     if not wait_for_job_run_completion:
         return tokens
 
@@ -206,7 +215,9 @@ def build_pre_aggregations(
     while iterate:
 
         # fetch
-        logger.info(f"waiting {wait_time_between_api_calls}sec for the job completion...")
+        logger.info(
+            f"waiting {wait_time_between_api_calls}sec for the job completion..."
+        )
         time.sleep(wait_time_between_api_calls)
         query = json.dumps(
             {
