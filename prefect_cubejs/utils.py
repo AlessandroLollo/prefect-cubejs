@@ -92,7 +92,7 @@ class CubeJSClient:
         """
 
         return f"{self.cube_base_url}/v1/sql"
-    
+
     def _get_pre_aggregations_jobs_api_url(self) -> str:
         """
         Get Cube Pre-Aggregations Jobs API URL.
