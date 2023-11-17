@@ -6,7 +6,11 @@ from prefect_cubejs.exceptions import (
     CubeJSAPIFailureException,
     CubeJSConfigurationException,
 )
+
+from prefect_cubejs.blocks import AuthHeader, SecurityContext
 from prefect_cubejs.tasks import build_pre_aggregations
+
+from pydantic.v1 import SecretStr
 
 # run: pytest -s tests/test_jobs.py
 
@@ -180,23 +184,15 @@ response_status_done = {
 def test_no_params():
     @flow(name="test_no_params")
     def test_flow():
-        result = build_pre_aggregations()
-        return result
-
-    msg_match = "Missing both `subdomain` and `url`."
-    with pytest.raises(CubeJSConfigurationException, match=msg_match):
-        test_flow()
-
-
-def test_no_secret():
-    @flow(name="test_no_secret")
-    def test_flow():
         result = build_pre_aggregations(
-            url="http://localhost:4000/cubejs-system",
+            auth_header=AuthHeader(
+                security_context=None,
+                api_secret=SecretStr("secret")
+            )
         )
         return result
 
-    msg_match = "Missing `api_secret` and `api_secret_env_var` not found."
+    msg_match = "Missing both `subdomain` and `url`."
     with pytest.raises(CubeJSConfigurationException, match=msg_match):
         test_flow()
 
@@ -205,8 +201,11 @@ def test_no_selector():
     @flow(name="test_no_selector")
     def test_flow():
         result = build_pre_aggregations(
-            url="http://localhost:4000/cubejs-system",
-            api_secret="23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1",
+            auth_header=AuthHeader(
+                security_context=None,
+                api_secret=SecretStr("23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1")
+            ),
+            url="http://localhost:4000/cubejs-system"
         )
         return result
 
@@ -220,8 +219,11 @@ def test_internal_error():
     @flow(name="test_internal_error")
     def test_flow():
         result = build_pre_aggregations(
+            auth_header=AuthHeader(
+                security_context=None,
+                api_secret=SecretStr("23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1")
+            ),
             url="http://localhost:4000/cubejs-system",
-            api_secret="23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1",
             selector=selector,
         )
         return result
@@ -243,8 +245,11 @@ def test_no_wait_completion():
     @flow(name="test_no_wait_completion")
     def test_flow():
         result = build_pre_aggregations(
+            auth_header=AuthHeader(
+                security_context=None,
+                api_secret=SecretStr("23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1")
+            ),
             url="http://localhost:4000/cubejs-system",
-            api_secret="23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1",
             selector=selector,
         )
         return result
@@ -264,8 +269,11 @@ def test_wait_completion_one_step():
     @flow(name="test_wait_completion_one_step")
     def test_flow():
         result = build_pre_aggregations(
+            auth_header=AuthHeader(
+                security_context=None,
+                api_secret=SecretStr("23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1")
+            ),
             url="http://localhost:4000/cubejs-system",
-            api_secret="23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1",
             selector=selector,
             wait_for_job_run_completion=True,
             wait_time_between_api_calls=0,
@@ -293,8 +301,11 @@ def test_wait_completion_two_step():
     @flow(name="test_wait_completion_two_step")
     def test_flow():
         result = build_pre_aggregations(
+            auth_header=AuthHeader(
+                security_context=None,
+                api_secret=SecretStr("23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1")
+            ),
             url="http://localhost:4000/cubejs-system",
-            api_secret="23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1",
             selector=selector,
             wait_for_job_run_completion=True,
             wait_time_between_api_calls=0,
@@ -328,8 +339,11 @@ def test_wait_completion_three_step():
     @flow(name="test_wait_completion_three_step")
     def test_flow():
         result = build_pre_aggregations(
+            auth_header=AuthHeader(
+                security_context=None,
+                api_secret=SecretStr("23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1")
+            ),
             url="http://localhost:4000/cubejs-system",
-            api_secret="23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1",
             selector=selector,
             wait_for_job_run_completion=True,
             wait_time_between_api_calls=0,
@@ -370,8 +384,11 @@ def test_missing_partitions():
     @flow(name="test_missing_partitions")
     def test_flow():
         result = build_pre_aggregations(
+            auth_header=AuthHeader(
+                security_context=None,
+                api_secret=SecretStr("23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1")
+            ),
             url="http://localhost:4000/cubejs-system",
-            api_secret="23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1",
             selector=selector,
             wait_for_job_run_completion=True,
             wait_time_between_api_calls=0,
@@ -401,8 +418,11 @@ def test_failure():
     @flow(name="test_failure")
     def test_flow():
         result = build_pre_aggregations(
+            auth_header=AuthHeader(
+                security_context=None,
+                api_secret=SecretStr("23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1")
+            ),
             url="http://localhost:4000/cubejs-system",
-            api_secret="23dff8b29cf20df38a4c78dfaf689fa55916add4d27ee3dd9ba75d1",
             selector=selector,
             wait_for_job_run_completion=True,
             wait_time_between_api_calls=0,

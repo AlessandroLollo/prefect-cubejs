@@ -48,5 +48,6 @@ plugins:
 
 nav:
     - Home: index.md
+    - Blocks: blocks.md
     - Tasks: tasks.md
 

@@ -9,6 +9,8 @@ from requests import Session
 
 from prefect_cubejs.exceptions import CubeJSAPIFailureException
 
+from prefect_cubejs.blocks import AuthHeader
+
 
 class CubeJSClient:
     """
@@ -23,8 +25,7 @@ class CubeJSClient:
         self,
         subdomain: str,
         url: str,
-        security_context: Union[str, Dict],
-        secret: str,
+        auth_header: AuthHeader,
         wait_api_call_secs: int,
         max_wait_time: int,
     ):
@@ -36,11 +37,8 @@ class CubeJSClient:
             - subdomain (str): Cube Cloud subdomain.
             - url (str): Cube.js URL (likely to be used in self-hosted Cube.js
                 deployments).
-            - security_context (str, dict): The security context to be used
+            - auth_header (AuthHeader): The `AuthHeader` object to be used
                 when interacting with Cube.js APIs.
-            - secret (str): The secret string to be used, together with the
-                `security_context`, to generate the API token to pass in the
-                authorization header.
             - wait_api_call_secs (int): Number of seconds to wait
                 between API calls.
             - max_wait_time (int): The maximum amount of seconds to wait for
@@ -48,10 +46,8 @@ class CubeJSClient:
         """
         self.subdomain = subdomain
         self.url = url
-        self.security_context = security_context
-        self.secret = secret
+        self.auth_header = auth_header
         self.cube_base_url = self._get_cube_base_url()
-        self.api_token = self.get_api_token()
         self.query_api_url = self._get_query_api_url()
         self.generated_sql_api_url = self._get_generated_sql_api_url()
         self.pre_aggregations_jobs_api_url = self._get_pre_aggregations_jobs_api_url()
@@ -102,29 +98,6 @@ class CubeJSClient:
         """
         return f"{self.cube_base_url}/v1/pre-aggregations/jobs"
 
-    def get_api_token(self) -> str:
-        """
-        Build API Token given the security context and the secret.
-
-        Returns:
-            - The API Token to include in the authorization headers
-                when calling Cube.js APIs.
-        """
-        api_token = jwt.encode(payload={}, key=self.secret)
-        if self.security_context:
-
-            extended_context = self.security_context
-            if (
-                "exp" not in self.security_context
-                and "expiresIn" not in self.security_context
-            ):
-                extended_context["expiresIn"] = "7d"
-            api_token = jwt.encode(
-                payload=extended_context, key=self.secret, algorithm="HS256"
-            )
-
-        return api_token
-
     def _get_data_from_url(self, api_url: str, params: Dict) -> Dict:
         """
         Retrieve data from a Cube.js API.
@@ -144,7 +117,7 @@ class CubeJSClient:
         session = Session()
         session.headers = {
             "Content-type": "application/json",
-            "Authorization": self.api_token,
+            "Authorization": self.auth_header.api_token.get_secret_value(),
         }
         elapsed_wait_time = 0
         while not self.max_wait_time or elapsed_wait_time <= self.max_wait_time:
@@ -213,7 +186,7 @@ class CubeJSClient:
         session = Session()
         session.headers = {
             "Content-type": "application/json",
-            "Authorization": self.api_token,
+            "Authorization": self.auth_header.api_token.get_secret_value(),
         }
 
         with session.post(
