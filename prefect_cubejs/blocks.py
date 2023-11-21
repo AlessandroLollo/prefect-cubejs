@@ -1,10 +1,11 @@
-"CubeJS blocks"
-from prefect.blocks.core import Block
-from prefect.blocks.fields import SecretDict
+"""CubeJS blocks"""
+
+from typing import Optional
 
 import jwt
+from prefect.blocks.core import Block
+from prefect.blocks.fields import SecretDict
 from pydantic.v1 import SecretStr
-from typing import Dict, Optional, Union
 
 
 class SecurityContext(Block):
@@ -13,10 +14,10 @@ class SecurityContext(Block):
     If the `exp` or `expiresIn` keys are not provided, they will be
     added automatically.
 
-    Args:
-        security_context (SecretDict): JSON object to use as the security context
+    Attributes:
+        security_context: JSON object to use as the security context
             while interacting with CubeJS APIs.
-    
+
     Example:
         Load stored CubeJS Security Context
         ```python
@@ -30,7 +31,7 @@ class SecurityContext(Block):
     _block_type_name = "CubeJS Security Context"
     _block_type_slug = "cubejs-security-context"
     _logo_url = "http://www.todo.com"
-    _description = "Block that contains a valid Cube JS security context to be used when interacting with CubeJS APIs."
+    _description = "Block that contains a valid Cube JS security context to be used when interacting with CubeJS APIs."  # noqa
 
 
 class AuthHeader(Block):
@@ -39,10 +40,10 @@ class AuthHeader(Block):
     to build the authorization header that will be used to interact
     with CubeJS API.
 
-    Args:
-        security_context (Optional[SecurityContext]): An optional
+    Attributes:
+        security_context: An optional
             `SecurityContext` block.
-    
+
     Example:
         Load stored CubeJS Authorization Header
         ```python
@@ -57,20 +58,19 @@ class AuthHeader(Block):
     _block_type_name = "CubeJS Authorization Context"
     _block_type_slug = "cubejs-auth-context"
     _logo_url = "http://www.todo.com"
-    _description = "Block that contains a valid Cube JS authorization context (optional security context + API secret) to be used when interacting with CubeJS APIs."
+    _description = "Block that contains a valid Cube JS authorization context (optional security context + API secret) to be used when interacting with CubeJS APIs."  # noqa
 
     @property
     def api_token(self) -> SecretStr:
         api_token = jwt.encode(payload={}, key=self.api_secret.get_secret_value())
         if isinstance(self.security_context, SecurityContext):
             extended_context = self.security_context.security_context.get_secret_value()
-            if (
-                "exp" not in extended_context
-                and "expiresIn" not in extended_context
-            ):
+            if "exp" not in extended_context and "expiresIn" not in extended_context:
                 extended_context["expiresIn"] = "7d"
             api_token = jwt.encode(
-                payload=extended_context, key=self.api_secret.get_secret_value(), algorithm="HS256"
+                payload=extended_context,
+                key=self.api_secret.get_secret_value(),
+                algorithm="HS256",
             )
 
         return SecretStr(api_token)

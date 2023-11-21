@@ -1,15 +1,68 @@
-"""
-Cube.js utils classes
-"""
-import time
-from typing import Dict, Union
+"""Cube.js utils classes"""
 
-import jwt
+import time
+from typing import Dict, Union, Optional
+
 from requests import Session
 
 from prefect_cubejs.exceptions import CubeJSAPIFailureException
 
-from prefect_cubejs.blocks import AuthHeader
+from prefect_cubejs.blocks import AuthHeader, SecurityContext
+from prefect import get_run_logger
+from prefect_cubejs.exceptions import CubeJSConfigurationException
+from prefect.blocks.fields import SecretDict
+
+import os
+import json
+
+
+def _get_auth_header(
+    api_secret: Optional[str],
+    api_secret_env_var: Optional[str],
+    security_context: Optional[Union[str, Dict]],
+) -> AuthHeader:
+    """
+    Helper method the build the `AuthHeader` object required by `CubeJSClient`.
+
+    Args:
+        api_secret: The API secret used to generate an
+            API token for authentication.
+            If provided, it takes precedence over `api_secret_env_var`.
+        api_secret_env_var: The name of the env var that contains
+            the API secret to use to generate an API token for authentication.
+            Defaults to `CUBEJS_API_SECRET`.
+        security_context: The security context to use
+            during authentication.
+            If the security context does not contain an expiration period,
+            then a 7-day expiration period is added automatically.
+            More info at https://cube.dev/docs/security/context.
+
+    Returns:
+        An `AuthHeader` object generated using the provided
+            API secret and security context.
+    """
+
+    logger = get_run_logger()
+
+    if not api_secret and api_secret_env_var not in os.environ:
+        msg = "Missing `api_secret` and `api_secret_env_var` not found."
+        raise CubeJSConfigurationException(msg)
+
+    logger.warning(
+        "You're still using `security_context` and `api_secret`. Please consider switching to `auth_header`"  # noqa
+    )
+    context = None
+    if security_context:
+        sec_context = SecretDict(
+            json.loads(security_context)
+            if isinstance(security_context, str)
+            else security_context
+        )
+        context = SecurityContext(security_context=sec_context)
+    return AuthHeader(
+        security_context=context,
+        api_secret=api_secret if api_secret else os.environ[api_secret_env_var],
+    )
 
 
 class CubeJSClient:
